@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio de Desenho Geométrico — 6º Ano</title>
+<style>
+:root {
+  color-scheme: light;
+  --accent: #2b7bb9;
+  --accent-contrast: #ffffff;
+  --accent-text: #1d5f92;
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
+}
+*, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid; }
+html, body { margin: 0; padding: 0; }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eef6fb 0%, #f5fbf7 100%);
+  color: #1b2f3f;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+svg { display: block; vertical-align: middle; max-width: 100%; }
+button { color: inherit; background-color: transparent; font: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.between { justify-content: space-between; }
+.items-center { align-items: center; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 38px; padding: 0 16px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 600; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: #1d5f92; }
+.btn:disabled { opacity: 0.45; pointer-events: none; }
+.btn[data-variant="secondary"] { background: rgba(20, 23, 31, 0.07); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: rgba(20, 23, 31, 0.13); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: rgba(43, 123, 185, 0.10); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: rgba(20, 23, 31, 0.07); color: var(--text); }
+.badge[data-variant="outline"] { background: #ffffff; color: var(--text); border-color: var(--border); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
+
+.app-header, .app-main {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.app-header {
+  padding: 24px 0 8px;
+}
+.app-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.app-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin: 6px 0 2px;
+  color: #13344d;
+}
+.app-subtitle {
+  color: #4a6275;
+  font-size: .95rem;
+  margin: 0;
+}
+.live-counters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.app-main {
+  padding: 8px 0 32px;
+}
+.quiz-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(20,60,90,.08);
+  padding: 24px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.module-tag {
+  display: inline-block;
+  background: #dff1e7;
+  color: #1f6b47;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: .8rem;
+  font-weight: 600;
+}
+.q-counter {
+  font-size: .85rem;
+  color: #4a6275;
+}
+.progress-track {
+  height: 10px;
+  background: #dbe7ef;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2b7bb9, #3aa675);
+  border-radius: 999px;
+  transition: width .4s ease;
+}
+.question-text {
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 18px 0 14px;
+  color: #13344d;
+}
+.diagram-wrap {
+  background: #f8fbfe;
+  border: 1px solid #d9e7f2;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+.option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 15px 18px;
+  margin-bottom: 11px;
+  border-radius: 14px;
+  border: 2px solid #cfe0ec;
+  background: #fff;
+  color: #1b2f3f;
+  font-size: 1.02rem;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .2s ease, background .2s ease;
+}
+.option-btn:hover:not(:disabled) {
+  border-color: #2b7bb9;
+  transform: translateY(-1px);
+}
+.option-btn:disabled {
+  cursor: default;
+}
+.option-btn.correct {
+  background: #d7f3e3;
+  border-color: #2e9a64;
+  color: #14432c;
+  font-weight: 600;
+}
+.option-btn.wrong {
+  background: #fde2e2;
+  border-color: #c94a4a;
+  color: #6e1d1d;
+  font-weight: 600;
+}
+.quiz-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.hint-box {
+  background: #fff7e0;
+  color: #5a4305;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  font-size: .95rem;
+  line-height: 1.5;
+}
+.feedback-box {
+  padding: 16px;
+  border-radius: 14px;
+  line-height: 1.55;
+  margin-top: 16px;
+}
+.feedback-box.ok {
+  background: #e6f6ee;
+  color: #14432c;
+}
+.feedback-box.no {
+  background: #fdeeee;
+  color: #6e1d1d;
+}
+.feedback-box p {
+  margin: 6px 0 0;
+}
+.hero-score {
+  background: linear-gradient(135deg, #e3f1fb 0%, #e2f5ea 100%);
+  border-radius: 18px;
+  padding: 26px;
+  text-align: center;
+}
+.hero-label {
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .8rem;
+  color: #4a6275;
+  font-weight: 600;
+}
+.big {
+  font-size: 3.1rem;
+  font-weight: 700;
+  color: #1d5f92;
+  line-height: 1.1;
+  margin: 6px 0;
+}
+.hero-caption {
+  color: #2c4658;
+  margin: 4px 0;
+}
+.hero-message {
+  font-weight: 600;
+  color: #13344d;
+  margin-top: 10px;
+}
+.bar-block {
+  margin-bottom: 14px;
+}
+.bar-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: .9rem;
+  margin-bottom: 6px;
+  color: #1b2f3f;
+}
+.bar-track {
+  height: 14px;
+  background: #e3edf4;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .5s ease;
+}
+.bar-fill.weak {
+  background: linear-gradient(90deg, #d9793b, #e0a34a);
+}
+.bar-fill.good {
+  background: linear-gradient(90deg, #2b7bb9, #3aa675);
+}
+.attention-note {
+  background: #fff7e0;
+  color: #5a4305;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 8px;
+  font-size: .95rem;
+}
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+.review-item {
+  border-left: 4px solid #c94a4a;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fbf7f7;
+  margin-bottom: 14px;
+}
+.review-item p {
+  margin: 6px 0;
+  line-height: 1.5;
+}
+.app-footer {
+  text-align: center;
+  font-size: .85rem;
+  color: #4a6275;
+  padding: 16px;
+  margin-top: auto;
+}
+.fade-in {
+  animation: fadeIn .35s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.eyebrow {
+  display: inline-block;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 600;
+  color: #1d5f92;
+  background: #e3f1fb;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+@media (max-width: 600px) {
+  .quiz-card { padding: 18px; }
+  .app-header, .app-main { padding-left: 16px; padding-right: 16px; }
+  .option-btn { font-size: .98rem; padding: 13px 14px; }
+  .big { font-size: 2.5rem; }
+}
+@media print {
+  .app-footer, .result-actions, .quiz-footer { display: none !important; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+<div class="app-header-top">
+<div>
+<span class="eyebrow">📐 Preparação · Prof.ª Sueli</span>
+<h1 class="app-title">📐 Desafio de Desenho Geométrico</h1>
+<p class="app-subtitle">6º Ano — Bissetriz, Ângulos, Mediatriz, Esquadros e Linhas</p>
+</div>
+<div class="live-counters">
+<span class="badge" data-variant="secondary" id="badgeAnswered">0 respondidas</span>
+<span class="badge" data-variant="outline" id="badgeHits">0 acertos</span>
+</div>
+</div>
+</header>
+
+<main class="app-main" id="app"></main>
+
+<footer class="app-footer">Desafio de Desenho Geométrico • 6º Ano</footer>
+
+<script>
+const SVGS = {
+  bissetrizAdj: `<svg width="280" height="125" viewBox="0 0 280 125">
+    <line x1="40" y1="105" x2="250" y2="105" stroke="#13344d" stroke-width="2.2"/>
+    <line x1="40" y1="105" x2="215" y2="52" stroke="#13344d" stroke-width="2.2"/>
+    <line x1="40" y1="105" x2="140" y2="18" stroke="#13344d" stroke-width="2.2"/>
+    <line x1="40" y1="105" x2="182" y2="31" stroke="#c0262d" stroke-width="1.8" stroke-dasharray="5,4"/>
+    <line x1="40" y1="105" x2="236" y2="80" stroke="#2b7bb9" stroke-width="1.8" stroke-dasharray="5,4"/>
+    <circle cx="40" cy="105" r="3.5" fill="#13344d"/>
+    <text x="26" y="114" font-size="13" font-weight="700" fill="#13344d">O</text>
+    <text x="125" y="16" font-size="12" font-weight="700" fill="#13344d">A</text>
+    <text x="220" y="50" font-size="12" font-weight="700" fill="#13344d">B</text>
+    <text x="254" y="109" font-size="12" font-weight="700" fill="#13344d">C</text>
+    <text x="112" y="58" font-size="12" font-weight="700" fill="#c0262d">60°</text>
+    <text x="155" y="96" font-size="12" font-weight="700" fill="#2b7bb9">40°</text>
+  </svg>`,
+  mediatriz: `<svg width="280" height="120" viewBox="0 0 280 120">
+    <line x1="35" y1="78" x2="245" y2="78" stroke="#13344d" stroke-width="2.4"/>
+    <line x1="140" y1="12" x2="140" y2="112" stroke="#2b7bb9" stroke-width="2.2"/>
+    <rect x="140" y="64" width="14" height="14" fill="none" stroke="#2b7bb9" stroke-width="1.6"/>
+    <line x1="35" y1="78" x2="140" y2="26" stroke="#3aa675" stroke-width="1.8" stroke-dasharray="4,3"/>
+    <line x1="245" y1="78" x2="140" y2="26" stroke="#3aa675" stroke-width="1.8" stroke-dasharray="4,3"/>
+    <circle cx="35" cy="78" r="3.5" fill="#13344d"/>
+    <circle cx="245" cy="78" r="3.5" fill="#13344d"/>
+    <circle cx="140" cy="78" r="3.5" fill="#2b7bb9"/>
+    <circle cx="140" cy="26" r="4" fill="#c0262d"/>
+    <text x="24" y="95" font-size="13" font-weight="700" fill="#13344d">A</text>
+    <text x="242" y="95" font-size="13" font-weight="700" fill="#13344d">B</text>
+    <text x="125" y="95" font-size="12" font-weight="700" fill="#2b7bb9">M</text>
+    <text x="148" y="28" font-size="13" font-weight="700" fill="#c0262d">P</text>
+    <text x="62" y="45" font-size="12" font-weight="700" fill="#1f6b47">PA = 7 cm</text>
+    <text x="175" y="45" font-size="12" font-weight="700" fill="#1f6b47">PB = ?</text>
+  </svg>`,
+  paralelasTransv: `<svg width="280" height="125" viewBox="0 0 280 125">
+    <line x1="25" y1="40" x2="255" y2="40" stroke="#13344d" stroke-width="2.2"/>
+    <line x1="25" y1="90" x2="255" y2="90" stroke="#13344d" stroke-width="2.2"/>
+    <line x1="85" y1="12" x2="195" y2="116" stroke="#2b7bb9" stroke-width="2.2"/>
+    <text x="260" y="44" font-size="12" font-weight="700" fill="#13344d">r</text>
+    <text x="260" y="94" font-size="12" font-weight="700" fill="#13344d">s</text>
+    <text x="198" y="118" font-size="12" font-weight="700" fill="#2b7bb9">t</text>
+    <text x="132" y="34" font-size="12" font-weight="700" fill="#c0262d">50°</text>
+    <text x="184" y="84" font-size="12" font-weight="700" fill="#1f6b47">x</text>
+  </svg>`
+};
+
+const QUESTIONS = [
+  // Bloco 1: Bissetriz e Ângulos
+  {
+    m: 1,
+    q: "Na hora de traçar a bissetriz de um ângulo com o transferidor, qual é a regra obrigatória na leitura da abertura?",
+    o: [
+      "Começar a contar sempre pelo 180° e subtrair a medida",
+      "Começar a contar sempre a partir do ZERO que está encostado em um dos lados do ângulo",
+      "Posicionar o centro do transferidor fora do vértice do ângulo",
+      "Escolher qualquer um dos dois zeros do transferidor, pois o resultado é o mesmo"
+    ],
+    c: 1,
+    h: "O transferidor tem duas escalas (uma começa no 0° da direita e outra no 0° da esquerda). Qual zero está apoiado na linha?",
+    e: "Devemos sempre começar pelo ZERO alinhado na linha de fé (sobre o lado do ângulo). Ler pelo zero oposto é o erro mais comum na prova!"
+  },
+  {
+    m: 1,
+    q: "Qual é a medida do COMPLEMENTO e do SUPLEMENTO de um ângulo de 62°, respectivamente?",
+    o: [
+      "38° e 128°",
+      "118° e 28°",
+      "28° e 118°",
+      "28° e 128°"
+    ],
+    c: 2,
+    h: "Lembre do truque: Complemento = Canto reto (90° - 62°). Suplemento = Super linha reta (180° - 62°).",
+    e: "Complemento: 90° - 62° = 28°. Suplemento: 180° - 62° = 118°."
+  },
+  {
+    m: 1,
+    svg: "bissetrizAdj",
+    q: "Na figura (Atividade 7b da apostila), os ângulos adjacentes AÔB = 60° e BÔC = 40° estão colados. Quanto mede o ângulo formado entre as bissetrizes de cada um deles?",
+    o: [
+      "100°",
+      "50°",
+      "20°",
+      "30°"
+    ],
+    c: 1,
+    h: "A bissetriz divide cada ângulo exatamente ao meio. Divida 60° por 2, divida 40° por 2 e some as duas metades!",
+    e: "A bissetriz de 60° forma duas metades de 30°. A bissetriz de 40° forma duas metades de 20°. Entre as duas bissetrizes temos 30° + 20° = 50°."
+  },
+  {
+    m: 1,
+    q: "Para construir com o transferidor um ângulo de 60° e seu complemento colado nele (Atividade 7a), onde você apoia o zero do transferidor no segundo passo?",
+    o: [
+      "Em cima do lado de cima do ângulo de 60° que acabou de ser desenhado",
+      "No meio do papel, longe do vértice original",
+      "Somente na linha horizontal de baixo, marcando 30° por cima do 60°",
+      "Não se usa transferidor para construir complemento, apenas compasso"
+    ],
+    c: 0,
+    h: "Os dois ângulos precisam ficar adjacentes (um colado no outro) para somarem 90° juntos.",
+    e: "Mantendo o centro no mesmo vértice, alinhamos o zero do transferidor no lado de cima do ângulo de 60° e marcamos os 30° que faltam para fechar o canto reto de 90°."
+  },
+
+  // Bloco 2: Mediatriz e Esquadros
+  {
+    m: 2,
+    svg: "mediatriz",
+    q: "A reta azul é a mediatriz do segmento AB, passando pelo ponto médio M. Se um ponto P sobre a mediatriz está a 7 cm da ponta A, quanto mede a distância PB?",
+    o: [
+      "3,5 cm, porque a mediatriz divide tudo por 2",
+      "14 cm, porque é o dobro da medida",
+      "7 cm, porque todo ponto da mediatriz equidista das extremidades A e B",
+      "Depende do tamanho do segmento AB"
+    ],
+    c: 2,
+    h: "Lembre da palavra-chave da mediatriz: EQUIDISTAR (estar à mesma distância das duas pontas).",
+    e: "Por definição, qualquer ponto P pertencente à mediatriz equidista de A e de B (PA = PB). Logo, PB = 7 cm sem precisar de conta!"
+  },
+  {
+    m: 2,
+    q: "Quais são as DUAS condições obrigatórias para uma reta ser a mediatriz de um segmento AB?",
+    o: [
+      "Passar pelo ponto médio M e formar 90° (ser perpendicular) ao segmento",
+      "Sair do vértice e dividir o ângulo em duas partes iguais",
+      "Ser paralela ao segmento AB e ter o mesmo comprimento",
+      "Passar por uma das pontas (A ou B) formando 45°"
+    ],
+    c: 0,
+    h: "Se passar no meio mas ficar inclinada, não é mediatriz. Se formar 90° mas passar perto da ponta, também não é!",
+    e: "A mediatriz precisa cumprir as duas regras juntas: cortar o segmento exatamente no meio (ponto médio M) E cruzar formando 90° (perpendicular)."
+  },
+  {
+    m: 2,
+    q: "Para traçar retas PARALELAS usando o jogo de esquadros (pág. 86), qual procedimento está correto?",
+    o: [
+      "Usar apenas um esquadro e ir arrastando a olho nu",
+      "Manter o esquadro de 60° FIXO como trilho e deslizar (translação) o esquadro de 45° apoiado nele",
+      "Girar (rotação) o esquadro de 45° em torno do ângulo reto antes de traçar",
+      "Cruzar os dois esquadros em formato de X"
+    ],
+    c: 1,
+    h: "Paralelas nunca mudam de direção — então o esquadro móvel só desliza sem girar!",
+    e: "Para paralelas usamos TRANSLAÇÃO: o esquadro de 60° fica fixo como trilho e o de 45° desliza apoiado nele. O giro (rotação) só é feito para perpendiculares."
+  },
+  {
+    m: 2,
+    q: "Por que a apostila proíbe usar apenas UM esquadro sozinho para traçar retas paralelas ou perpendiculares?",
+    o: [
+      "Porque um esquadro sozinho não tem ângulo de 90°",
+      "Porque a ponta do lápis escorrega no canto, perde precisão e não há apoio para deslizar",
+      "Porque o esquadro de 45° só funciona em folhas quadriculadas",
+      "Porque a régua substitui os dois esquadros"
+    ],
+    c: 1,
+    h: "Pense no que acontece quando você tenta deslizar um triângulo na folha sem ter uma régua ou outro esquadro segurando ele.",
+    e: "Sem o segundo esquadro servindo de trilho fixo, o esquadro escorrega, o encontro das retas fica impreciso e é impossível manter o paralelismo ao deslizar."
+  },
+
+  // Bloco 3: Revisão de Ângulos e Linhas Notáveis
+  {
+    m: 3,
+    svg: "paralelasTransv",
+    q: "Na figura (Tarefa Em Casa 4, pág. 106), as retas r e s são paralelas cortadas pela transversal t. Se o ângulo agudo marcado mede 50°, quanto mede o ângulo agudo x?",
+    o: [
+      "130°, pois são suplementares",
+      "40°, pois são complementares",
+      "50°, pois nas paralelas cortadas por transversal todos os ângulos agudos são iguais entre si",
+      "90°, pois formam um canto reto"
+    ],
+    c: 2,
+    h: "Observe os dois ângulos marcados: ambos são fechadinhos (agudos, menores que 90°).",
+    e: "Quando uma transversal corta duas paralelas, todos os ângulos agudos têm a mesma medida (50°), e todos os obtusos também são iguais entre si (130°)."
+  },
+  {
+    m: 3,
+    q: "Um exercício pede: 'Trace a linha formada por todos os pontos do plano que estão a 3 cm de distância de uma RETA u'. Qual linha você deve desenhar?",
+    o: [
+      "Uma circunferência de raio 3 cm",
+      "Uma única reta paralela acima da reta u",
+      "Um PAR de retas paralelas (duas retas, uma de cada lado de u, a 3 cm)",
+      "A mediatriz da reta u"
+    ],
+    c: 2,
+    h: "Cuidado com a pegadinha! Existem pontos a 3 cm acima da reta u e também a 3 cm abaixo dela.",
+    e: "A distância de um ponto a uma reta pode ser medida para os dois lados. Por isso, a resposta é um PAR de retas paralelas (uma de cada lado de u)."
+  },
+  {
+    m: 3,
+    q: "Qual linha notável reúne todos os pontos que EQUIDISTAM de dois pontos fixos H e I?",
+    o: [
+      "Bissetriz",
+      "Mediatriz do segmento HI",
+      "Reta paralela média",
+      "Circunferência"
+    ],
+    c: 1,
+    h: "Equidistar de DOIS PONTOS é a propriedade de ouro de qual linha que passa no ponto médio a 90°?",
+    e: "Equidistar de dois pontos = Mediatriz. (Equidistar dos dois lados de um ângulo = Bissetriz; equidistar de duas retas paralelas = Reta paralela média)."
+  },
+  {
+    m: 3,
+    q: "Desafio do Mapa (pág. 126): Um tesouro está a 1 quarteirão da Rua A e, ao mesmo tempo, à mesma distância das ruas paralelas B e C. De acordo com a Regra de Ouro do Módulo 4, como encontramos o tesouro?",
+    o: [
+      "Traçando apenas uma circunferência com o compasso",
+      "Cruzando DUAS condições: as paralelas a 1 quarteirão da Rua A com a reta paralela média entre B e C",
+      "Medindo com o transferidor o ângulo entre as ruas",
+      "Marcando um ponto qualquer no meio da Rua A"
+    ],
+    c: 1,
+    h: "Lembre da Regra de Ouro: todo ponto exato nasce do CRUZAMENTO de duas linhas!",
+    e: "Todo ponto nasce da interseção (cruzamento) de duas linhas: traçamos o par de paralelas a 1 quarteirão da Rua A e cruzamos com a reta paralela média entre B e C."
+  }
+];
+
+const MODULE_NAMES = {
+  1: "Bloco 1: Bissetriz e Ângulos",
+  2: "Bloco 2: Mediatriz e Esquadros",
+  3: "Bloco 3: Revisão e Linhas Notáveis"
+};
+const MODULES = [1, 2, 3];
+
+const state = {
+  screen: "quiz",
+  current: 0,
+  answers: Array(QUESTIONS.length).fill(null),
+  hintShown: Array(QUESTIONS.length).fill(false),
+  retakeIndexes: null
+};
+
+function showToast(message, opts) {
+  opts = opts || {};
+  const toaster = document.querySelector(".toaster") || document.body.appendChild(Object.assign(document.createElement("div"), { className: "toaster" }));
+  const item = document.createElement("div");
+  item.className = "toast";
+  item.setAttribute("aria-hidden", "true");
+  if (opts.type) item.setAttribute("data-type", opts.type);
+  const content = document.createElement("div");
+  content.className = "toast-content";
+  content.textContent = message;
+  item.appendChild(content);
+  toaster.appendChild(item);
+  requestAnimationFrame(() => item.setAttribute("aria-hidden", "false"));
+  setTimeout(() => {
+    item.setAttribute("aria-hidden", "true");
+    setTimeout(() => item.remove(), 350);
+  }, 3000);
+}
+
+function activeIndexes() {
+  return state.retakeIndexes || QUESTIONS.map((_, i) => i);
+}
+
+function isCorrect(i) {
+  return state.answers[i] !== null && state.answers[i] === QUESTIONS[i].c;
+}
+
+function hitsCount() {
+  return activeIndexes().filter(i => isCorrect(i)).length;
+}
+
+function updateCounters() {
+  const answered = activeIndexes().filter(i => state.answers[i] !== null).length;
+  const hits = activeIndexes().filter(i => isCorrect(i)).length;
+  const a = document.getElementById("badgeAnswered");
+  const h = document.getElementById("badgeHits");
+  if (a) a.textContent = answered + " respondidas";
+  if (h) h.textContent = hits + " acertos";
+}
+
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function render() {
+  const app = document.getElementById("app");
+  if (state.screen === "quiz") renderQuiz(app);
+  else if (state.screen === "result") renderResult(app);
+  else if (state.screen === "review") renderReview(app);
+  updateCounters();
+}
+
+function renderQuiz(app) {
+  const idxs = activeIndexes();
+  const pos = state.current;
+  const qi = idxs[pos];
+  const q = QUESTIONS[qi];
+  const answered = state.answers[qi] !== null;
+  const isLast = pos === idxs.length - 1;
+  const pct = (pos / idxs.length) * 100;
+  const hint = state.hintShown[qi];
+
+  let diagramHtml = "";
+  if (q.svg && SVGS[q.svg]) {
+    diagramHtml = `<div class="diagram-wrap">${SVGS[q.svg]}</div>`;
+  }
+
+  let optionsHtml = q.o.map((opt, k) => {
+    let cls = "option-btn";
+    if (answered) {
+      if (k === q.c) cls += " correct";
+      else if (k === state.answers[qi]) cls += " wrong";
+    }
+    return `<button class="${cls}" data-choice="${k}" ${answered ? "disabled" : ""}>${escapeHtml(opt)}</button>`;
+  }).join("");
+
+  let feedback = "";
+  if (answered) {
+    const ok = state.answers[qi] === q.c;
+    feedback = `<div class="feedback-box ${ok ? "ok" : "no"} fade-in">
+      <strong>${ok ? "✅ Muito bem! Resposta certa." : "❌ Atenção! Não foi dessa vez."}</strong>
+      <p>${escapeHtml(q.e)}</p>
+    </div>`;
+  }
+
+  app.innerHTML = `
+  <div class="quiz-card fade-in">
+    <div class="row between items-center">
+      <span class="module-tag">${MODULE_NAMES[q.m]}</span>
+      <span class="q-counter">Questão ${pos + 1} de ${idxs.length}</span>
+    </div>
+    <div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <h2 class="question-text">${escapeHtml(q.q)}</h2>
+    ${diagramHtml}
+    <div id="options">${optionsHtml}</div>
+    ${hint && !answered ? `<div class="hint-box">💡 <strong>Dica:</strong> ${escapeHtml(q.h)}</div>` : ""}
+    ${feedback}
+    <div class="quiz-footer">
+      <button class="btn" data-variant="ghost" id="btnHint" ${answered || hint ? "disabled" : ""}>💡 Precisa de uma dica?</button>
+      <button class="btn" id="btnNext" ${answered ? "" : "disabled"}>${isLast ? "Ver resultado" : "Próxima ➔"}</button>
+    </div>
+  </div>`;
+
+  app.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const choice = Number(btn.dataset.choice);
+      state.answers[qi] = choice;
+      render();
+    });
+  });
+
+  const hintBtn = document.getElementById("btnHint");
+  if (hintBtn) hintBtn.addEventListener("click", () => {
+    state.hintShown[qi] = true;
+    render();
+  });
+
+  const nextBtn = document.getElementById("btnNext");
+  if (nextBtn) nextBtn.addEventListener("click", () => {
+    if (isLast) {
+      state.screen = "result";
+    } else {
+      state.current++;
+    }
+    render();
+    scrollTop();
+  });
+}
+
+function message(pct) {
+  if (pct >= 85) return "Sensacional, Bia! Você dominou a matéria da prova!";
+  if (pct >= 65) return "Muito bom! Você está super bem preparada para amanhã.";
+  if (pct >= 45) return "Bom esforço! Dê uma olhada rápida nos erros para fechar 100%.";
+  return "Sem pressa! Leia a explicação dos erros e refaça o treino.";
+}
+
+function moduleStats() {
+  const idxs = activeIndexes();
+  return MODULES.map(m => {
+    const qs = idxs.filter(i => QUESTIONS[i].m === m);
+    const hits = qs.filter(i => isCorrect(i)).length;
+    const total = qs.length;
+    const pct = total ? Math.round((hits / total) * 100) : 0;
+    return { m, hits, total, pct };
+  }).filter(s => s.total > 0);
+}
+
+function renderResult(app) {
+  const idxs = activeIndexes();
+  const hits = hitsCount();
+  const total = idxs.length;
+  const pct = Math.round((hits / total) * 100);
+  const stats = moduleStats();
+  const worst = stats.reduce((a, b) => (b.pct < a.pct ? b : a), stats[0]);
+  const wrongCount = idxs.filter(i => !isCorrect(i)).length;
+
+  const bars = stats.map(s => {
+    const cls = s.m === worst.m && s.pct < 75 ? "weak" : "good";
+    return `<div class="bar-block">
+      <div class="bar-head"><span>${MODULE_NAMES[s.m]}</span><span>${s.hits}/${s.total} · ${s.pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill ${cls}" style="width:${s.pct}%"></div></div>
+    </div>`;
+  }).join("");
+
+  const attentionHtml = wrongCount > 0
+    ? `<div class="attention-note">📌 Ponto de atenção: <strong>${MODULE_NAMES[worst.m]}</strong> teve ${worst.pct}% de acertos. Vale revisar essas questões!</div>`
+    : `<div class="attention-note" style="background:#e6f6ee;color:#14432c;">🏆 Gabaritou! Você acertou todas as questões!</div>`;
+
+  app.innerHTML = `
+  <div class="quiz-card fade-in">
+    <div class="hero-score">
+      <div class="hero-label">Seu desempenho</div>
+      <div class="big">${pct}%</div>
+      <p class="hero-caption">${hits} de ${total} acertos nesta rodada</p>
+      <p class="hero-message">${message(pct)}</p>
+    </div>
+    <h3 style="margin:22px 0 12px;color:#13344d">Desempenho por assunto</h3>
+    ${bars}
+    ${attentionHtml}
+    <div class="result-actions">
+      <button class="btn" id="btnReview" ${wrongCount === 0 ? "disabled" : ""}>Revisar respostas erradas (${wrongCount})</button>
+      <button class="btn" data-variant="secondary" id="btnRetryWrong" ${wrongCount === 0 ? "disabled" : ""}>Refazer só os erros (${wrongCount})</button>
+      <button class="btn" data-variant="outline" id="btnRetryAll">Refazer o quiz completo</button>
+      <button class="btn" data-variant="ghost" id="btnCopy">Copiar resultado</button>
+    </div>
+  </div>`;
+
+  const rev = document.getElementById("btnReview");
+  if (rev) rev.addEventListener("click", () => { state.screen = "review"; render(); scrollTop(); });
+  const rw = document.getElementById("btnRetryWrong");
+  if (rw) rw.addEventListener("click", () => {
+    const wrong = activeIndexes().filter(i => !isCorrect(i));
+    resetFor(wrong);
+    showToast("Refazendo " + wrong.length + " questão(ões) que você errou.");
+  });
+  document.getElementById("btnRetryAll").addEventListener("click", () => {
+    resetFor(null);
+    showToast("Quiz reiniciado. Boa sorte!");
+  });
+  document.getElementById("btnCopy").addEventListener("click", () => copyResult(hits, total, pct, stats));
+}
+
+function resetFor(indexes) {
+  if (indexes) {
+    state.retakeIndexes = indexes;
+    indexes.forEach(i => { state.answers[i] = null; state.hintShown[i] = false; });
+  } else {
+    state.retakeIndexes = null;
+    state.answers = Array(QUESTIONS.length).fill(null);
+    state.hintShown = Array(QUESTIONS.length).fill(false);
+  }
+  state.current = 0;
+  state.screen = "quiz";
+  render();
+  scrollTop();
+}
+
+function copyResult(hits, total, pct, stats) {
+  const lines = [
+    "Desafio de Desenho Geométrico — 6º Ano",
+    `Resultado: ${hits} de ${total} acertos (${pct}%)`,
+    ...stats.map(s => `${MODULE_NAMES[s.m]}: ${s.hits}/${s.total} (${s.pct}%)`),
+    message(pct)
+  ].join("\n");
+  if (!navigator.clipboard) {
+    showToast("Não foi possível copiar neste navegador.", { type: "error" });
+    return;
+  }
+  navigator.clipboard.writeText(lines).then(
+    () => showToast("Resultado copiado!", { type: "success" }),
+    () => showToast("Não foi possível copiar o resultado.", { type: "error" })
+  );
+}
+
+function renderReview(app) {
+  const wrong = activeIndexes().filter(i => !isCorrect(i));
+  const items = wrong.map(i => {
+    const q = QUESTIONS[i];
+    const mine = state.answers[i];
+    const yours = (mine === null || mine === undefined) ? "Não respondida" : q.o[mine];
+    return `<div class="review-item">
+      <span class="module-tag">${MODULE_NAMES[q.m]}</span>
+      <p><strong>${escapeHtml(q.q)}</strong></p>
+      <p>❌ <strong>Sua resposta:</strong> ${escapeHtml(yours)}</p>
+      <p>✅ <strong>Resposta correta:</strong> ${escapeHtml(q.o[q.c])}</p>
+      <p><strong>Explicação:</strong> ${escapeHtml(q.e)}</p>
+    </div>`;
+  }).join("");
+
+  app.innerHTML = `
+  <div class="quiz-card fade-in">
+    <h2 style="margin:0 0 6px;color:#13344d">Revisão das respostas</h2>
+    <p class="app-subtitle">${wrong.length === 0 ? "Você não errou nenhuma questão desta rodada." : "Veja o que marcou, a resposta correta e a explicação de cada erro."}</p>
+    <div style="margin-top:18px">${items}</div>
+    <div class="result-actions">
+      <button class="btn" data-variant="outline" id="btnBackResult">Voltar ao resultado</button>
+    </div>
+  </div>`;
+  document.getElementById("btnBackResult").addEventListener("click", () => { state.screen = "result"; render(); scrollTop(); });
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>
